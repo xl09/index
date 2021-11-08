@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博客</title>
+    <title>Document</title>
     <style>
         html,
         body {
@@ -42,6 +42,11 @@
         .drawer.show {
             left: 0;
         }
+        
+        main {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -50,11 +55,16 @@
     <div class="drawer">
         <button class="hide">hide</button>
     </div>
-    <mian>
+    <main>
         <button class="show">show</button>
-    </mian>
+    </main>
 </body>
 <script>
+    /**
+     * 抽屉常用功能start
+     */
+
+    // 封装抽屉开关对象
     var obj = {
         drawer: document.querySelector('.drawer'),
         mask: document.querySelector('.mask'),
@@ -68,26 +78,30 @@
         }
     };
 
+    // 点击显示抽屉
     function show(el) {
         el.onclick = function() {
             obj.show();
         };
     };
     show(document.querySelector('.show'));
-
+    // 点击隐藏抽屉
     function hide(el) {
         el.onclick = function() {
             obj.hide();
         };
     };
-    hide(document.querySelector('.mask'));
+    hide(document.querySelector('.mask')); // 点击遮罩层关闭抽屉
     hide(document.querySelector('.hide'));
 
+    // 左滑抽屉关闭
     function touchHide(el) {
         var startX;
         el.addEventListener('touchstart', function(event) {
-            startX = event.changedTouches[0].pageX;
-        }, false);
+            startX = event.changedTouches[0].pageX; // 手指触摸起始X轴位置
+        }, {
+            passive: false //关闭谷歌自带判断
+        });
         el.addEventListener('touchmove', function(event) {
             event.preventDefault();
             var moveX = event.changedTouches[0].pageX;
@@ -111,6 +125,43 @@
         }, false)
     }
     touchHide(document.querySelector('.drawer'));
+    // 右滑抽屉打开
+    function touchShow(el) {
+        var startX;
+        el.addEventListener('touchstart', function(event) {
+            startX = event.changedTouches[0].pageX;
+        }, {
+            passive: false
+        });
+        el.addEventListener('touchmove', function(event) {
+            event.preventDefault();
+            var moveX = event.changedTouches[0].pageX;
+            if (260 >= moveX - startX > 0) {
+                document.querySelector('.drawer').style.left = moveX - startX - 260 + 'px';
+                var opacity = (((moveX - startX) / 260) * 0.8).toFixed(1);
+                if (opacity) {
+                    document.querySelector('.mask').style.width = '100%';
+                    document.querySelector('.mask').style.height = '100%';
+                }
+                document.querySelector('.mask').style.opacity = opacity;
+            }
+        }, {
+            passive: false
+        });
+        el.addEventListener('touchend', function(event) {
+            var endX = event.changedTouches[0].pageX;
+            if (endX - startX > 150) {
+                obj.show();
+            } else {
+                obj.hide();
+            }
+            document.querySelector('.drawer').removeAttribute("style");
+            document.querySelector('.mask').removeAttribute("style");
+        })
+    }
+    touchShow(document.querySelector('main'));
+
+    /* 抽屉常用功能end */
 </script>
 
 </html>
