@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drawer</title>
+    <title>Document</title>
     <style>
         html,
         body {
@@ -36,7 +36,7 @@
         .mask.show {
             width: 100%;
             height: 100%;
-            opacity: .6;
+            opacity: .8;
         }
         
         .drawer.show {
@@ -50,7 +50,9 @@
     <div class="drawer">
         <button class="hide">hide</button>
     </div>
-    <button class="show">show</button>
+    <mian>
+        <button class="show">show</button>
+    </mian>
 </body>
 <script>
     var obj = {
@@ -80,6 +82,35 @@
     };
     hide(document.querySelector('.mask'));
     hide(document.querySelector('.hide'));
+
+    function touchHide(el) {
+        var startX;
+        el.addEventListener('touchstart', function(event) {
+            startX = event.changedTouches[0].pageX;
+        }, false);
+        el.addEventListener('touchmove', function(event) {
+            event.preventDefault();
+            var moveX = event.changedTouches[0].pageX;
+            if (startX - moveX > 0) {
+                el.style.left = moveX - startX + 'px';
+                var opacity = (((260 - (startX - moveX)) / 260) * 0.8).toFixed(1);
+                document.querySelector('.mask').style.opacity = opacity;
+            }
+        }, {
+            passive: false
+        });
+        el.addEventListener('touchend', function(event) {
+            var endX = event.changedTouches[0].pageX;
+            if (startX - endX > 100) {
+                obj.hide();
+            } else {
+                obj.show();
+            }
+            el.removeAttribute("style");
+            document.querySelector('.mask').removeAttribute("style");
+        }, false)
+    }
+    touchHide(document.querySelector('.drawer'));
 </script>
 
 </html>
